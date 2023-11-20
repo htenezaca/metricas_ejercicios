@@ -3,58 +3,69 @@ package editor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+interface SpellChecker {
+	List<String> check(String text);
+}
+
+class BasicSpellChecker implements SpellChecker {
+	private final List<String> realWords = Arrays.asList("foo", "bar");
+
+	@Override
+	public List<String> check(String text) {
+		List<String> words = Arrays.asList(text.split(" "));
+		return words.stream()
+				.filter(word -> !realWords.contains(word.toLowerCase()))
+				.collect(Collectors.toList());
+	}
+}
+
+class ConsoleOutput {
+	public void displayErrors(List<String> errors) {
+		errors.forEach(error -> System.out.println("ERROR: " + error));
+	}
+
+	public void displaySuccessMessage() {
+		System.out.println("No errors found!");
+	}
+}
 
 public class Editor {
-	
+	private final SpellChecker spellChecker;
+	private final ConsoleOutput consoleOutput;
+
+	public Editor(SpellChecker spellChecker, ConsoleOutput consoleOutput) {
+		this.spellChecker = spellChecker;
+		this.consoleOutput = consoleOutput;
+	}
+
 	public void checkSpelling(String text) {
-		ArrayList<String> errors = this.check(text);
-		if(errors != null)
-			this.displayErrors(errors);
-		else
-			this.displaySuccessMessage();
-	}
-	
-	public void displayErrors(ArrayList<String> errors) {
-		for(int i=0; i<errors.size(); i++) {
-			System.out.println("ERROR: " + errors.get(i));
+		List<String> errors = spellChecker.check(text);
+		if (!errors.isEmpty()) {
+			consoleOutput.displayErrors(errors);
+		} else {
+			consoleOutput.displaySuccessMessage();
 		}
 	}
-	
-	public Object displaySuccessMessage() {
-		System.out.println("No errors found!");
-		return null;
-	}
-	
-	public ArrayList<String> check(String text) {
-		String[] words = text.split("");
-		ArrayList<String> errors = new ArrayList<String>();
-		for(int i=0; i< words.length; i++) {
-			String[] realWords = {"foo", "bar"};
-			for(int j=0; j<realWords.length; j++) {
-				if(!words[i].equalsIgnoreCase(realWords[j])) {
-					errors.add(words[i]);
-				}
-			}
-		}
-		return errors;
-	}
-	
+
 	public void runEditor() {
 		System.out.println("Running editor...");
 		System.out.println("Enter text:");
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		String text;
-		try {
-			text = br.readLine();
-			this.checkSpelling(text);
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+			String text = br.readLine();
+			checkSpelling(text);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args) {
-		Editor editor = new Editor();
+		SpellChecker spellChecker = new BasicSpellChecker();
+		ConsoleOutput consoleOutput = new ConsoleOutput();
+		Editor editor = new Editor(spellChecker, consoleOutput);
 		editor.runEditor();
 	}
 }

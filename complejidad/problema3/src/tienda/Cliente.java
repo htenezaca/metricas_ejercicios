@@ -1,16 +1,15 @@
 package tienda;
 
-
 public class Cliente {
-    private String tipo;
+    private TipoCliente tipo;
     private String nombre;
 
-    public Cliente(String tipo, String nombre) {
+    public Cliente(TipoCliente tipo, String nombre) {
         this.tipo = tipo;
         this.nombre = nombre;
     }
 
-    public String getTipo() {
+    public TipoCliente getTipo() {
         return tipo;
     }
 
@@ -18,4 +17,14 @@ public class Cliente {
         return nombre;
     }
 
+    public double obtenerDescuento() {
+        switch (tipo) {
+            case PREMIUM:
+                return 0.9;
+            case VIP:
+                return 0.8;
+            default:
+                return 1.0;
+        }
+    }
 }

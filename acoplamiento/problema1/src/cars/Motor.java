@@ -1,14 +1,15 @@
 package cars;
 
-public class Motor {
-	
-	public int speed;
-	public int rpm;
-	public float oilLevel;
-	public float gasLevel;
-	
-	public Motor() {
-		
-	}
+public interface Motor {
+	void accelerate();
 
+	void stop();
+
+	int getSpeed();
+
+	int getRpm();
+
+	float getOilLevel();
+
+	float getGasLevel();
 }

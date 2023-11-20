@@ -1,47 +1,68 @@
 const plays = require("./data/plays.json");
 const invoices = require("./data/invoices.json");
 
-function statement (invoice, plays) {
-  let totalAmount = 0;
-  let volumeCredits = 0;
-  let result = `Statement for ${invoice.customer}\n`;
-  const format = new Intl.NumberFormat("en-US",
-                        { style: "currency", currency: "USD",
-                          minimumFractionDigits: 2 }).format;
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = 0;
+function formatAmount(amount) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(amount / 100);
+}
 
-    switch (play.type) {
-    case "tragedy":
-      thisAmount = 40000;
-      if (perf.audience > 30) {
-        thisAmount += 1000 * (perf.audience - 30);
-      }
-      break;
-    case "comedy":
-      thisAmount = 30000;
-      if (perf.audience > 20) {
-        thisAmount += 10000 + 500 * (perf.audience - 20);
-      }
-      thisAmount += 300 * perf.audience;
-      break;
-    default:
-        throw new Error(`unknown type: ${play.type}`);
-    }
+function calculateAmount(play, perf) {
+  const baseAmount = play.type === "comedy" ? 30000 : 40000;
+  let thisAmount = baseAmount;
 
-    // add volume credits
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    // add extra credit for every ten comedy attendees
-    if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
-
-    // print line for this order
-    result += `  ${play.name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`;
-    totalAmount += thisAmount;
+  if (perf.audience > (play.type === "comedy" ? 20 : 30)) {
+    thisAmount += 1000 * (perf.audience - (play.type === "comedy" ? 20 : 30));
   }
-  result += `Amount owed is ${format(totalAmount/100)}\n`;
-  result += `You earned ${volumeCredits} credits\n`;
-  return result;
+
+  if (play.type === "comedy") {
+    thisAmount += 500 * perf.audience;
+  }
+
+  return thisAmount;
+}
+
+function calculateTotalAmount(invoice, plays) {
+  return invoice.performances.reduce((total, perf) => {
+    const play = plays[perf.playID];
+    return total + calculateAmount(play, perf);
+  }, 0);
+}
+
+function calculateVolumeCredits(invoice, plays) {
+  return invoice.performances.reduce((credits, perf) => {
+    const play = plays[perf.playID];
+    return (
+      credits +
+      Math.max(perf.audience - (play.type === "comedy" ? 20 : 30), 0) +
+      (play.type === "comedy" ? Math.floor(perf.audience / 5) : 0)
+    );
+  }, 0);
+}
+
+function generateStatementLine(play, perf, totalAmount) {
+  const thisAmount = totalAmount - (play.type === "comedy" ? 30000 : 40000);
+  return `  ${play.name}: ${formatAmount(thisAmount)} (${perf.audience} seats)`;
+}
+
+function statement(invoice, plays) {
+  const totalAmount = calculateTotalAmount(invoice, plays);
+  const volumeCredits = calculateVolumeCredits(invoice, plays);
+
+  const statementLines = invoice.performances.map((perf) => {
+    const play = plays[perf.playID];
+    return generateStatementLine(play, perf, totalAmount);
+  });
+
+  return (
+    `Statement for ${invoice.customer}\n` +
+    statementLines.join("\n") +
+    `\nAmount owed is ${formatAmount(
+      totalAmount
+    )}\nYou earned ${volumeCredits} credits\n`
+  );
 }
 
 console.log(statement(invoices[0], plays));
