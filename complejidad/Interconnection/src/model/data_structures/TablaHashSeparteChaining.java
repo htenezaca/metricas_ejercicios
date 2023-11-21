@@ -2,7 +2,6 @@ package model.data_structures;
 
 import java.text.DecimalFormat;
 
-import sun.security.util.Debug;
 
 public class TablaHashSeparteChaining <K extends Comparable<K>, V extends Comparable <V>> implements ITablaSimbolos<K, V >
 {
