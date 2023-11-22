@@ -2,7 +2,7 @@ package model.data_structures;
 
 import java.util.Comparator;
 
-public class Country implements Comparable <Country>
+public class Country implements Comparable <Country>, Coordenada
 {
 	private String countryName;
 	

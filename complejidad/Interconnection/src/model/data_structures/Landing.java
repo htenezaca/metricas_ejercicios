@@ -1,6 +1,6 @@
 package model.data_structures;
 
-public class Landing implements Comparable <Landing>
+public class Landing implements Comparable <Landing>, Coordenada
 {
 	private String landingId;
 	
