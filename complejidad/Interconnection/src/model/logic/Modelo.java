@@ -18,17 +18,17 @@ public class Modelo {
     /**
      * Atributos del modelo del mundo
      */
-    private ILista datos;
+    public ILista datos;
 
-    private GrafoListaAdyacencia grafo;
+    public GrafoListaAdyacencia grafo;
 
-    private ITablaSimbolos paises;
+    public ITablaSimbolos paises;
 
-    private ITablaSimbolos points;
+    public ITablaSimbolos points;
 
-    private ITablaSimbolos landingidtabla;
+    public ITablaSimbolos landingidtabla;
 
-    private ITablaSimbolos nombrecodigo;
+    public ITablaSimbolos nombrecodigo;
 
     /**
      * Constructor del modelo del mundo con capacidad dada
