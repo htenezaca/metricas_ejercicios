@@ -210,7 +210,7 @@ public class CargarDatos {
         }
     }
 
-    private float distancia(double lon1, double lat1, double lon2, double lat2) {
+    float distancia(double lon1, double lat1, double lon2, double lat2) {
 
         final double R = 6371.0;
 
