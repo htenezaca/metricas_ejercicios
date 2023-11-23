@@ -34,12 +34,12 @@ public class Modelo {
      * Constructor del modelo del mundo con capacidad dada
      */
     public Modelo(int capacidad) {
-        datos = new ArregloDinamico<>(capacidad);
-        grafo = new GrafoListaAdyacencia(2);
-        paises = new TablaHashLinearProbing(2);
-        points = new TablaHashLinearProbing(2);
-        landingidtabla = new TablaHashSeparteChaining(2);
-        nombrecodigo = new TablaHashSeparteChaining(2);
+        this.datos = new ArregloDinamico<>(capacidad);
+        this.grafo = new GrafoListaAdyacencia(2);
+        this.paises = new TablaHashLinearProbing(2);
+        this.points = new TablaHashLinearProbing(2);
+        this.landingidtabla = new TablaHashSeparteChaining(2);
+        this.nombrecodigo = new TablaHashSeparteChaining(2);
     }
 
     /**
@@ -69,8 +69,8 @@ public class Modelo {
     }
 
     public String rutaMinima(String pais1Name, String pais2Name) {
-        Country pais1 = (Country) paises.get(pais1Name);
-        Country pais2 = (Country) paises.get(pais2Name);
+        Country pais1 = (Country) this.paises.get(pais1Name);
+        Country pais2 = (Country) this.paises.get(pais2Name);
         return new RutaMinima().invoke(pais1, pais2, this.grafo);
     }
 

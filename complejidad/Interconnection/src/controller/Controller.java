@@ -48,11 +48,11 @@ public class Controller<T> {
         Scanner lector = new Scanner(System.in).useDelimiter("\n");
         boolean fin = false;
 
+        modelo = new Modelo(1);
         while (!fin) {
             view.printMenu();
 
             String option = this.optionTranslate(lector.nextInt());
-            modelo = new Modelo(1);
             switch (option) {
                 case "cargar_datos":
                     view.printMessage("--------- \nCargar datos");
