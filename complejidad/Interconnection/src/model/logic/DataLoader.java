@@ -7,6 +7,7 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+
 import utils.Utils;
 
 public class DataLoader {
@@ -91,10 +92,10 @@ public class DataLoader {
         String cableid = record.get(3);
 
         Landing landing1 = getLanding(origin);
-        Landing landing2 = getLanding(destination);
+        addLandingVertexToGraph(landing1, cableid);
 
-        addVertexToGraph(landing1, cableid);
-        addVertexToGraph(landing2, cableid);
+        Landing landing2 = getLanding(destination);
+        addLandingVertexToGraph(landing2, cableid);
 
         processCountries(landing1, landing2, cableid);
 
@@ -116,15 +117,15 @@ public class DataLoader {
         return (Landing) points.get(landingId);
     }
 
-    private void addVertexToGraph(Landing landing, String cableid) {
+    private void addLandingVertexToGraph(Landing landing, String cableid) {
         grafo.insertVertex(landing.getLandingId() + cableid, landing);
     }
 
     private void processCountries(Landing landing1, Landing landing2, String cableid) {
         Country country1 = getCountry(landing1.getPais());
-        Country country2 = getCountry(landing2.getPais());
-
         addEdgeToGraph(country1, landing1, cableid);
+
+        Country country2 = getCountry(landing2.getPais());
         addEdgeToGraph(country2, landing2, cableid);
     }
 
@@ -152,12 +153,12 @@ public class DataLoader {
         Edge edge = grafo.getEdge(landing1.getLandingId() + cableid, landing2.getLandingId() + cableid);
         if (edge == null) {
             grafo.addEdge(landing1.getLandingId() + cableid, landing2.getLandingId() + cableid, weight);
-        } else {
-            float peso = edge.getWeight();
+            return;
+        }
 
-            if (weight > peso) {
-                edge.setWeight(weight);
-            }
+        float peso = edge.getWeight();
+        if (weight > peso) {
+            edge.setWeight(weight);
         }
     }
 
@@ -168,34 +169,37 @@ public class DataLoader {
             Vertex vertice2 = grafo.getVertex(landing2.getLandingId() + cableid);
 
             ILista elementopc = (ILista) landingIdTable.get(landing1.getLandingId());
-            elementopc = getiLista(landing1, landing2, vertice1, elementopc, landingIdTable);
-            elementopc = getiLista(landing2, landing1, vertice2, elementopc, nameCodeTable);
+            if (elementopc == null) {
+                ILista valores = new ArregloDinamico(1);
+                valores.insertElement(vertice1, valores.size() + 1);
 
+                landingIdTable.put(landing1.getLandingId(), valores);
+
+            } else {
+                elementopc.insertElement(vertice1, elementopc.size() + 1);
+            }
+
+            elementopc = (ILista) landingIdTable.get(landing2.getLandingId());
+            if (elementopc == null) {
+                ILista valores = new ArregloDinamico(1);
+                valores.insertElement(vertice2, valores.size() + 1);
+
+                landingIdTable.put(landing2.getLandingId(), valores);
+
+            } else {
+                elementopc.insertElement(vertice2, elementopc.size() + 1);
+            }
+
+            elementopc = (ILista) nameCodeTable.get(landing1.getLandingId());
             if (elementopc == null) {
                 String nombre = landing1.getName();
                 String codigo = landing1.getLandingId();
-
                 nameCodeTable.put(nombre, codigo);
-
             }
+
         } catch (PosException | NullException e) {
             e.printStackTrace();
         }
-    }
-
-    private ILista getiLista(Landing landing1, Landing landing2, Vertex vertice1, ILista elementopc, ITablaSimbolos tablaSimbolos) throws PosException, NullException {
-        if (elementopc == null) {
-            ILista valores = new ArregloDinamico(1);
-            valores.insertElement(vertice1, valores.size() + 1);
-
-            tablaSimbolos.put(landing1.getLandingId(), valores);
-
-        } else {
-            elementopc.insertElement(vertice1, elementopc.size() + 1);
-        }
-
-        elementopc = (ILista) tablaSimbolos.get(landing2.getLandingId());
-        return elementopc;
     }
 
     private void updateGraphEdges() {
