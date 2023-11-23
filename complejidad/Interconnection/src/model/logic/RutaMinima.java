@@ -7,13 +7,13 @@ public class RutaMinima {
     public String invoke(Country pais1, Country pais2, GrafoListaAdyacencia grafo) {
         String capital1 = pais1.getCapitalName();
         String capital2 = pais2.getCapitalName();
-        var pila = grafo.minPath(capital1, capital2);
+        PilaEncadenada pila = grafo.minPath(capital1, capital2);
 
         StringBuilder ruta = new StringBuilder("Ruta: ");
         float distanciaTotal = 0;
 
         while (!pila.isEmpty()) {
-            var arco = (Edge) pila.pop();
+            Edge arco = (Edge) pila.pop();
             Object origenInfo = arco.getSource().getInfo();
             Object destinoInfo = arco.getDestination().getInfo();
 
