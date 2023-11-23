@@ -6,6 +6,8 @@ import model.logic.Modelo;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class TestModelo<T> {
 	
 	private Modelo modelo;
@@ -27,14 +29,28 @@ public class TestModelo<T> {
 	}
 
 	@Test
-	public void testDarTamano() {
-		setUp2();
-		int x=modelo.darTamano();
-		assertEquals("No es el tamaño correcto", CAPACIDAD,x);
-		// TODO
+	public void testCargarDatos() throws IOException {
+		var modelo = new Modelo(1);
+		modelo.cargarDatos();
+		assertEquals(7843, modelo.grafo.edges().size());
+		assertEquals(6759, modelo.grafo.vertices().size());
+		assertEquals(235, modelo.paises.size());
 	}
 
-	
+	@Test
+	public void testPaises() throws IOException {
+		var modelo = new Modelo(1);
+		modelo.cargarDatos();
+		var colombia = modelo.paises.get("Colombia");
+		var chile = modelo.paises.get("Chile");
+		assertNotNull(colombia);
+		assertNotNull(chile);
+	}
 
-	
+	@Test
+	public void testRutaMinima() throws IOException {
+		var modelo = new Modelo(1);
+		modelo.cargarDatos();
+		modelo.rutaMinima("Colombia", "Chile");
+	}
 }
