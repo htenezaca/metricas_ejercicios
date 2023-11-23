@@ -9,6 +9,7 @@ import model.data_structures.NullException;
 import model.data_structures.PosException;
 import model.data_structures.VacioException;
 import model.data_structures.YoutubeVideo;
+import model.logic.CargarDatos;
 import model.logic.Modelo;
 import utils.Ordenamiento;
 import view.View;
@@ -26,7 +27,7 @@ public class Controller<T> {
 		lector = new Scanner(System.in).useDelimiter("\n");
 	}
 
-	public void run() {
+	public void run() throws Exception {
 		boolean fin = false;
 
 		while (!fin) {
@@ -35,7 +36,10 @@ public class Controller<T> {
 
 			switch (option) {
 				case 1:
-					cargarDatos();
+				{
+					CargarDatos cargador = new CargarDatos();
+					cargador.cargar();
+				}
 					break;
 				case 2:
 					req1();
@@ -67,10 +71,13 @@ public class Controller<T> {
 	private void cargarDatos() {
 		view.printMessage("--------- \nCargar datos");
 		modelo = new Modelo(1);
+		CargarDatos cargador = new CargarDatos();
+
 		try {
-			modelo.cargar();
-		} catch (IOException e) {
-			handleException(e);
+			cargador.cargar();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		view.printModelo(modelo);
 	}

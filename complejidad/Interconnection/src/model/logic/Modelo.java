@@ -432,6 +432,8 @@ public class Modelo {
 		}
 		return tabla;
 	}
+	
+	// esto ya no iria si queda el refactor de la clase CargarDatos
 
 	public void cargar() throws IOException {
 		grafo = new GrafoListaAdyacencia(2);
