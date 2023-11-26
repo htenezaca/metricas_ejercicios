@@ -30,7 +30,7 @@ public class TestModelo<T> {
 
 	@Test
 	public void testCargarDatos() throws IOException {
-		var modelo = new Modelo(1);
+		Modelo modelo = new Modelo(1);
 		modelo.cargarDatos();
 		assertEquals(7843, modelo.grafo.edges().size());
 		assertEquals(6759, modelo.grafo.vertices().size());
@@ -39,17 +39,17 @@ public class TestModelo<T> {
 
 	@Test
 	public void testPaises() throws IOException {
-		var modelo = new Modelo(1);
+		Modelo modelo = new Modelo(1);
 		modelo.cargarDatos();
-		var colombia = modelo.paises.get("Colombia");
-		var chile = modelo.paises.get("Chile");
+		Comparable colombia = modelo.paises.get("Colombia");
+		Comparable chile = modelo.paises.get("Chile");
 		assertNotNull(colombia);
 		assertNotNull(chile);
 	}
 
 	@Test
 	public void testRutaMinima() throws IOException {
-		var modelo = new Modelo(1);
+		Modelo modelo = new Modelo(1);
 		modelo.cargarDatos();
 		modelo.rutaMinima("Colombia", "Chile");
 	}

@@ -49,73 +49,100 @@ public class Controller<T> {
         boolean fin = false;
 
         modelo = new Modelo(1);
+
         while (!fin) {
             view.printMenu();
 
-            String option = this.optionTranslate(lector.nextInt());
-            switch (option) {
-                case "cargar_datos":
-                    view.printMessage("--------- \nCargar datos");
-                    try {
-                        modelo.cargarDatos();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    view.printModelo(modelo);
+            int opcion = lector.nextInt();
+            lector.nextLine();
+
+            switch (opcion) {
+                case 1:
+                    cargarDatos();
                     break;
 
-                case "componentes_conectados":
-                    view.printMessage("--------- \nIngrese el nombre del primer punto de conexión");
-                    String punto1 = lector.next();
-                    lector.nextLine();
-
-                    view.printMessage("--------- \nIngrese el nombre del segundo punto de conexión");
-                    String punto2 = lector.next();
-                    lector.nextLine();
-
-                    String res1 = modelo.componentesConectados(punto1, punto2);
-                    view.printMessage(res1);
-
+                case 2:
+                    encontrarComponentesConectados(lector);
                     break;
 
-                case "encontrar_landings_interconexion":
-                    String res2 = modelo.encontrarInterconexiones();
-                    view.printMessage(res2);
+                case 3:
+                    encontrarLandingsInterconexion();
                     break;
 
-                case "ruta_minima":
-                    view.printMessage("--------- \nIngrese el nombre del primer país");
-                    String pais1 = lector.next();
-                    lector.nextLine();
+                case 4:
+                    encontrarRutaMinima(lector);
+                    break;
 
-                    view.printMessage("--------- \nIngrese el nombre del segundo país");
-                    String pais2 = lector.next();
-                    lector.nextLine();
+                case 5:
+                    encontrarRedExpansionMinima();
+                    break;
 
-                    String res3 = modelo.rutaMinima(pais1, pais2);
-                    view.printMessage(res3);
+                case 6:
+                    encontrarFallasEnConexion(lector);
                     break;
-                case "red_expansion_minima":
-                    String res4 = modelo.redExpansionMinima();
-                    view.printMessage(res4);
-                    break;
-                case "fallas_en_conexion":
-                    view.printMessage("--------- \nIngrese el nombre del punto de conexión");
-                    String landing = lector.next();
-                    lector.nextLine();
-                    String res5 = modelo.fallasEnConexion(landing);
-                    view.printMessage(res5);
-                    break;
-                case "exit":
-                    view.printMessage("--------- \n Hasta pronto !! \n---------");
-                    lector.close();
+
+                case 0:
                     fin = true;
                     break;
+
                 default:
-                    view.printMessage("--------- \n Opcion Invalida !! \n---------");
+                    view.printMessage("--------- \n Opción Inválida !! \n---------");
                     break;
             }
         }
 
+        view.printMessage("--------- \n ¡Hasta pronto! \n---------");
+        lector.close();
     }
+
+    private void cargarDatos() {
+        view.printMessage("--------- \nCargar datos");
+        try {
+            modelo.cargarDatos();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        view.printModelo(modelo);
+    }
+
+    private void encontrarComponentesConectados(Scanner lector) {
+        String punto1 = leerDato("Ingrese el nombre del primer punto de conexión", lector);
+        String punto2 = leerDato("Ingrese el nombre del segundo punto de conexión", lector);
+
+        String resultado = modelo.componentesConectados(punto1, punto2);
+        view.printMessage(resultado);
+    }
+
+    private void encontrarLandingsInterconexion() {
+        String resultado = modelo.encontrarInterconexiones();
+        view.printMessage(resultado);
+    }
+
+    private void encontrarRutaMinima(Scanner lector) {
+        String pais1 = leerDato("Ingrese el nombre del primer país", lector);
+        String pais2 = leerDato("Ingrese el nombre del segundo país", lector);
+
+        String resultado = modelo.rutaMinima(pais1, pais2);
+        view.printMessage(resultado);
+    }
+
+    private void encontrarRedExpansionMinima() {
+        String resultado = modelo.redExpansionMinima();
+        view.printMessage(resultado);
+    }
+
+    private void encontrarFallasEnConexion(Scanner lector) {
+        String landing = leerDato("Ingrese el nombre del punto de conexión", lector);
+
+        String resultado = modelo.fallasEnConexion(landing);
+        view.printMessage(resultado);
+    }
+
+    // Método común para leer datos
+    private String leerDato(String mensaje, Scanner lector) {
+        view.printMessage("--------- \n" + mensaje);
+        return lector.next();
+    }
+
+
 }

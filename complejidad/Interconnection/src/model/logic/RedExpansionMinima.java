@@ -9,73 +9,100 @@ import java.util.Comparator;
 
 public class RedExpansionMinima {
     public String invoke(ILista lista1, GrafoListaAdyacencia grafo) {
-        String fragmento = "";
+        StringBuilder fragmento = new StringBuilder();
         String llave = "";
-
         int distancia = 0;
 
         try {
-            int max = 0;
-            for (int i = 1; i <= lista1.size(); i++) {
-                if (((ILista) lista1.getElement(i)).size() > max) {
-                    max = ((ILista) lista1.getElement(i)).size();
-                    llave = (String) ((Vertex) ((ILista) lista1.getElement(i)).getElement(1)).getId();
-                }
-            }
-
-            ILista lista2 = grafo.mstPrimLazy(llave);
+            String maxKey = encontrarLlaveConMaximaConexion(lista1);
+            ILista lista2 = grafo.mstPrimLazy(maxKey);
 
             ITablaSimbolos tabla = new TablaHashSeparteChaining<>(2);
-            ILista candidatos = new ArregloDinamico<>(1);
-            for (int i = 1; i <= lista2.size(); i++) {
-                Edge arco = ((Edge) lista2.getElement(i));
-                distancia += arco.getWeight();
-
-                candidatos.insertElement(arco.getSource(), candidatos.size() + 1);
-
-                candidatos.insertElement(arco.getDestination(), candidatos.size() + 1);
-
-                tabla.put(arco.getDestination().getId(), arco.getSource());
-            }
+            ILista candidatos = construirListaCandidatosYTabla(lista2, tabla);
 
             ILista unificado = Unificador.invoke(candidatos, "Vertice");
-            fragmento += " La cantidad de nodos conectada a la red de expansión mínima es: " + unificado.size() + "\n El costo total es de: " + distancia;
+            fragmento.append(" La cantidad de nodos conectados a la red de expansión mínima es: ")
+                    .append(unificado.size())
+                    .append("\n El costo total es de: ")
+                    .append(distancia);
 
-            int maximo = 0;
-            int contador = 0;
-            PilaEncadenada caminomax = new PilaEncadenada();
-            for (int i = 1; i <= unificado.size(); i++) {
+            PilaEncadenada caminoMaximo = encontrarRamaMasLarga(unificado, tabla);
+            fragmento.append("\n La rama más larga está dada por los vértices: ")
+                    .append(obtenerIdVertices(caminoMaximo));
 
-                PilaEncadenada path = new PilaEncadenada();
-                String idBusqueda = (String) ((Vertex) unificado.getElement(i)).getId();
-                Vertex actual;
-
-                while ((actual = (Vertex) tabla.get(idBusqueda)) != null && actual.getInfo() != null) {
-                    path.push(actual);
-                    idBusqueda = (String) ((Vertex) actual).getId();
-                    contador++;
-                }
-
-                if (contador > maximo) {
-                    caminomax = path;
-                }
-            }
-
-            fragmento += "\n La rama más larga está dada por lo vértices: ";
-            for (int i = 1; i <= caminomax.size(); i++) {
-                Vertex pop = (Vertex) caminomax.pop();
-                fragmento += "\n Id " + i + " : " + pop.getId();
-            }
         } catch (PosException | VacioException | NullException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
-        if (fragmento.equals("")) {
-            return "No hay ninguna rama";
-        } else {
-            return fragmento;
-        }
+        return fragmento.toString().isEmpty() ? "No hay ninguna rama" : fragmento.toString();
     }
 
+    private String encontrarLlaveConMaximaConexion(ILista lista1) throws PosException, VacioException {
+        String llave = "";
+        int max = 0;
+
+        for (int i = 1; i <= lista1.size(); i++) {
+            ILista sublist = (ILista) lista1.getElement(i);
+            if (sublist.size() > max) {
+                max = sublist.size();
+                llave = (String) ((Vertex) sublist.getElement(1)).getId();
+            }
+        }
+
+        return llave;
+    }
+
+    private ILista construirListaCandidatosYTabla(ILista lista2, ITablaSimbolos tabla) throws PosException, VacioException, NullException {
+        ILista candidatos = new ArregloDinamico<>(1);
+        int distancia = 0;
+
+        for (int i = 1; i <= lista2.size(); i++) {
+            Edge arco = ((Edge) lista2.getElement(i));
+            distancia += arco.getWeight();
+
+            candidatos.insertElement(arco.getSource(), candidatos.size() + 1);
+            candidatos.insertElement(arco.getDestination(), candidatos.size() + 1);
+
+            tabla.put(arco.getDestination().getId(), arco.getSource());
+        }
+
+        return candidatos;
+    }
+
+    private PilaEncadenada encontrarRamaMasLarga(ILista unificado, ITablaSimbolos tabla) throws PosException, NullException, VacioException {
+        int maximo = 0;
+        PilaEncadenada caminoMaximo = new PilaEncadenada();
+
+        for (int i = 1; i <= unificado.size(); i++) {
+            PilaEncadenada path = new PilaEncadenada();
+            String idBusqueda = (String) ((Vertex) unificado.getElement(i)).getId();
+            Vertex actual;
+
+            int contador = 0;
+            while ((actual = (Vertex) tabla.get(idBusqueda)) != null && actual.getInfo() != null) {
+                path.push(actual);
+                idBusqueda = (String) ((Vertex) actual).getId();
+                contador++;
+            }
+
+            if (contador > maximo) {
+                caminoMaximo = path;
+                maximo = contador;
+            }
+        }
+
+        return caminoMaximo;
+    }
+
+    private String obtenerIdVertices(PilaEncadenada caminoMaximo) throws NullException, VacioException {
+        StringBuilder ids = new StringBuilder();
+
+        for (int i = 1; i <= caminoMaximo.size(); i++) {
+            Vertex pop = (Vertex) caminoMaximo.pop();
+            ids.append("\n Id ").append(i).append(" : ").append(pop.getId());
+        }
+
+        return ids.toString();
+    }
 }
+

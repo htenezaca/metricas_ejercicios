@@ -207,18 +207,19 @@ public class DataLoader {
             ILista valores = landingIdTable.valueSet();
 
             for (int i = 1; i <= valores.size(); i++) {
-                for (int j = 1; j <= ((ILista) valores.getElement(i)).size(); j++) {
-                    Vertex vertice1;
-                    if (valores.getElement(i) != null) {
-                        vertice1 = (Vertex) ((ILista) valores.getElement(i)).getElement(j);
-                        for (int k = 2; k <= ((ILista) valores.getElement(i)).size(); k++) {
-                            Vertex vertice2 = (Vertex) ((ILista) valores.getElement(i)).getElement(k);
+                ILista vertices = (ILista) valores.getElement(i);
+
+                if (vertices != null) {
+                    for (int j = 1; j <= vertices.size(); j++) {
+                        Vertex vertice1 = (Vertex) vertices.getElement(j);
+
+                        for (int k = j + 1; k <= vertices.size(); k++) {
+                            Vertex vertice2 = (Vertex) vertices.getElement(k);
                             grafo.addEdge(vertice1.getId(), vertice2.getId(), 100);
                         }
                     }
                 }
             }
-
         } catch (PosException | VacioException e) {
             e.printStackTrace();
         }

@@ -121,63 +121,55 @@ public final class Ordenamiento <T extends Comparable <T>>
 		return follower;
 	}
 	
-	public final void ordenarMergeSort(ILista<T> lista, Comparator<T> criterio, boolean ascendente) throws PosException, VacioException, NullException
-	{
-		int size = lista.size();
-		if(size > 1)
-		{
-			int mid = size/2;
-			//Se divide la lista original en dos partes, izquierda y derecha, desde el punto mid.
-			ILista<T> leftList = lista.sublista(1, mid);
-			ILista<T> rightList = lista.sublista(mid+1, size - mid);
+	public final void ordenarMergeSort(ILista<T> lista, Comparator<T> criterio, boolean ascendente)
+	        throws PosException, VacioException, NullException {
+	    int size = lista.size();
+	    if (size > 1) {
+	        int mid = size / 2;
+	        // Se divide la lista original en dos partes, izquierda y derecha, desde el punto mid.
+	        ILista<T> leftList = lista.sublista(1, mid);
+	        ILista<T> rightList = lista.sublista(mid + 1, size - mid);
 
-			//Se hace el llamado recursivo con la lista izquierda y derecha.
-			ordenarMergeSort(leftList, criterio, ascendente);
-			ordenarMergeSort(rightList, criterio, ascendente);
-			
-			//i recorre la lista de la izquierda, j la derecha y k la lista original.
-			int i,j,k;
-			i=j=k= 1;
-			
-			int leftelements = leftList.size();
-			int rightelements = rightList.size();
-			
-			while(i <= leftelements && j <= rightelements)
-			{
-				T elemi = leftList.getElement(i);
-				T elemj = rightList.getElement(j);
-				//Compara y ordena los elementos
-				int factorComparacion = (ascendente?1:-1) * criterio.compare(elemi, elemj);
-				
-				if(factorComparacion <= 0) 
-				{
-					lista.changeInfo(k, elemi);
-					i++;
-				}
-				else
-				{
-					lista.changeInfo(k, elemj);
-					j++;
-				}
-				k++;
-			}
-			
-			//Agrega los elementos que no se compararon y están ordenados
-			while(i <= leftelements)
-			{
-				lista.changeInfo(k, leftList.getElement(i));
-				i++;
-				k++;
-			}
-			
-			while(j <= rightelements)
-			{
-				lista.changeInfo(k, rightList.getElement(j));
-				j++;
-				k++;
-			}
-		}
+	        // Se hace el llamado recursivo con la lista izquierda y derecha.
+	        ordenarMergeSort(leftList, criterio, ascendente);
+	        ordenarMergeSort(rightList, criterio, ascendente);
+
+	        // i recorre la lista de la izquierda, j la derecha y k la lista original.
+	        int i = 1, j = 1, k = 1;
+
+	        int leftElements = leftList.size();
+	        int rightElements = rightList.size();
+
+	        while (i <= leftElements && j <= rightElements) {
+	            T elemI = leftList.getElement(i);
+	            T elemJ = rightList.getElement(j);
+	            // Compara y ordena los elementos
+	            int factorComparacion = (ascendente ? 1 : -1) * criterio.compare(elemI, elemJ);
+
+	            if (factorComparacion <= 0) {
+	                lista.changeInfo(k, elemI);
+	                i++;
+	            } else {
+	                lista.changeInfo(k, elemJ);
+	                j++;
+	            }
+	            k++;
+	        }
+
+	        k = agregarElementosRestantes(k, lista, leftList, i, leftElements);
+	        k = agregarElementosRestantes(k, lista, rightList, j, rightElements);
+	    }
 	}
+	
+	private int agregarElementosRestantes(int k,ILista<T> lista, ILista<T> sourceList, int startIndex, int endIndex) throws PosException, VacioException, NullException {
+	    for (int i = startIndex; i <= endIndex; i++) {
+	        lista.changeInfo(k, sourceList.getElement(i));
+	        k++;
+	    }
+	    return k;
+	}
+
+
 
 	
 }
